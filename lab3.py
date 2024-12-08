@@ -20,7 +20,7 @@ wave_color = (0, 100, 255)
 poplavok_color = (255, 0, 0)
 
 # задание пути к файлу
-filename = "waves_data.json"
+filename = "waves_data3.json"
 
 # значения по умолчанию
 default_data = {
