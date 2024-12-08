@@ -92,7 +92,7 @@ def open_settings(index, is_wave):
             try:
                 if is_wave:
                     # обновление параметров волны
-                    waves[index]["амплитуда"] = int(amplitude_spinbox.get())
+                    waves[index]["амплитуда"] = int(amplitude_slider.get())
                     waves[index]["период"] = int(period_spinbox.get())
                     waves[index]["скорость"] = float(speed_spinbox.get())
                 else:
@@ -110,12 +110,11 @@ def open_settings(index, is_wave):
         settings_window.title("настройка параметров")
 
         if is_wave:
-            # Параметры волны
+            # параметры волны
             Label(settings_window, text="амплитуда:").pack()
-            amplitude_spinbox = Spinbox(settings_window, from_=1, to=100, increment=1)
-            amplitude_spinbox.delete(0, "end")
-            amplitude_spinbox.insert(0, waves[index]["амплитуда"])
-            amplitude_spinbox.pack()
+            amplitude_slider = tk.Scale(settings_window, from_=1, to=100, orient="horizontal")
+            amplitude_slider.set(waves[index]["амплитуда"])
+            amplitude_slider.pack()
 
             Label(settings_window, text="период:").pack()
             period_spinbox = Spinbox(settings_window, from_=10, to=300, increment=10)
@@ -150,11 +149,11 @@ def open_settings(index, is_wave):
     thread = threading.Thread(target=thread_function)
     thread.start()
 
-# отрисовка волны
-def draw_wave(wave_y, amplitude, period, speed):
+# отрисовка волны с толщиной
+def draw_wave(wave_y, amplitude, period, speed, thickness=2):
     for x in range(width):
         y = wave_y + amplitude * math.sin(2 * math.pi * (x / period) - speed * time)
-        pygame.draw.circle(window, wave_color, (x, int(y)), 1)
+        pygame.draw.circle(window, wave_color, (x, int(y)), thickness)
 
 # отрисовка поплавка
 def draw_poplavok(wave_y, amplitude, period, speed, poplavok_x, mass, volume):
@@ -164,7 +163,7 @@ def draw_poplavok(wave_y, amplitude, period, speed, poplavok_x, mass, volume):
     pygame.draw.circle(window, poplavok_color, (int(poplavok_x), int(poplavok_y)), poplavok_radius)
 
 def handle_mouse_click(mouse_x, mouse_y):
-# определяет, куда кликнул пользователь: на волну или поплавок
+    # определяет, куда кликнул пользователь: на волну или поплавок
     for i, wave_y in enumerate(poplavok_positions):
         # позиция поплавка
         poplavok_x = (time * 100) % width
@@ -210,7 +209,7 @@ while running:
     if not paused:
         time = pygame.time.get_ticks() / 1000 - start_time
         for i, wave in enumerate(waves):
-            draw_wave(poplavok_positions[i], wave["амплитуда"], wave["период"], wave["скорость"])
+            draw_wave(poplavok_positions[i], wave["амплитуда"], wave["период"], wave["скорость"], thickness=3)
             draw_poplavok(poplavok_positions[i], wave["амплитуда"], wave["период"], wave["скорость"], (time * 100) % width, poplavki[i]["масса"], poplavki[i]["объем"])
 
     pygame.display.update()
