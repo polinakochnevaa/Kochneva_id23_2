@@ -23,7 +23,7 @@ active_color = (255, 255, 255)
 text_color = (0, 0, 0)
 
 # создаем файл если нет данных
-data_file = "waves_data3.json"
+data_file = "waves_data.json"
 if not os.path.exists(data_file):
     default_data = {
         "number of waves": 2,
