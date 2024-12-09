@@ -1,61 +1,64 @@
-import tkinter as tk
+import pygame
 import math
 
-# Инициализация основного окна
-root = tk.Tk()
-root.geometry("600x600")
+#инициализация Pygame
+pygame.init()
 
-# Создаем холст для рисования
-canvas = tk.Canvas(root, width=600, height=600, bg="white")
-canvas.pack(fill="both", expand=True)
+#размеры окна
+WIDTH, HEIGHT = 600, 600
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Точка на окружности")
 
-# Определение начальных параметров
-center = 300  # Центр холста по X и Y
-radius = 200  # Радиус основной окружности
-dot_radius = 5  # Радиус движущейся точки
+#цвета
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)
 
-# Создаем окружность в центре холста
-canvas.create_oval(center - radius, center - radius,
-                   center + radius, center + radius)
+#центр и радиус окружности
+center = (WIDTH // 2, HEIGHT // 2)
+radius = 200
 
-# Создаем движущуюся точку
-dot = canvas.create_oval(center - dot_radius, center - dot_radius,
-                         center + dot_radius, center + dot_radius, fill="red")
+#переменные для движения точки
+angle = 0  # Начальный угол (в радианах)
+speed = 0.05  # Скорость и направление движения (изменяемая переменная)
 
-# Параметры движения точки
-angle = 0  # Начальный угол
-speed = 5  # Переменная скорости и направления движения
+#основной игровой цикл
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
 
-# Функция для движения точки
-def move_dot():
-    global angle
-    # Вычисляем новые координаты точки
-    x = center + radius * math.cos(math.radians(angle)) - dot_radius
-    y = center + radius * math.sin(math.radians(angle)) - dot_radius
-    # Обновляем положение точки
-    canvas.coords(dot, x, y, x + 2 * dot_radius, y + 2 * dot_radius)
-    # Изменяем угол в зависимости от скорости
+        #управление скоростью и направлением через клавиши
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:
+                speed += 0.01  #увеличить скорость
+            elif event.key == pygame.K_DOWN:
+                speed -= 0.01  #уменьшить скорость
+            elif event.key == pygame.K_SPACE:
+                speed = -speed  #изменить направление
+
+    #очистка экрана
+    screen.fill(WHITE)
+
+    #рисуем окружность
+    pygame.draw.circle(screen, BLACK, center, radius, 1)
+
+    #вычисление координат точки на окружности
+    x = center[0] + radius * math.cos(angle)
+    y = center[1] + radius * math.sin(angle)
+
+    #рисуем точку
+    pygame.draw.circle(screen, RED, (int(x), int(y)), 5)
+
+    #обновление угла
     angle += speed
-    if angle >= 360:
-        angle = 0
-    root.after(50, move_dot)  # Повторяем вызов функции через 50 мс
 
-# Изменение скорости и направления
-def increase_speed():
-    global speed
-    speed += 1
+    #обновление экрана
+    pygame.display.flip()
 
-def decrease_speed():
-    global speed
-    speed -= 1
+    #задержка для ограничения FPS
+    pygame.time.delay(30)
 
-# Кнопки для управления скоростью
-btn_increase = tk.Button(root, text="Увеличить скорость", command=increase_speed)
-btn_increase.pack(side="left")
-
-btn_decrease = tk.Button(root, text="Уменьшить скорость", command=decrease_speed)
-btn_decrease.pack(side="left")
-
-# Запуск анимации
-move_dot()
-root.mainloop()
+#завершение Pygame
+pygame.quit()
